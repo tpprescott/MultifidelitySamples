@@ -331,7 +331,7 @@ function _variance_functional(μ, G)
             for i in 1:numChildren
                 v += _variance(T.children[i], T.ω)
             end
-            v *= T.μ / μ(T.θ, T.z...)
+            v *= T.μ / μ(T.θ, T.y...)
             for i in 1:numChildren
                 Ω_i = _evaluate(T.children[i])
                 for j in (i+1):numChildren
