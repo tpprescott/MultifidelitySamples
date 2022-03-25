@@ -149,7 +149,7 @@ function Base.show(io::IO, L_ρ::MultifidelityPathLikelihood{N}) where N
     for n in 1:N
         println(io, "L_{lo, ", n, "}: ", L_ρ.L_lo[n])
     end
-    println(io, "L_hi: ", L_ρ.L_hi)
+    print(io, "L_hi: ", L_ρ.L_hi)
 end
 
 
@@ -313,7 +313,7 @@ function _burden_functional(μ)
         for twig in T.children
             c += _burden(twig) / T.μ
         end
-        c *= μ(T.z...)
+        c *= μ(T.θ, T.y...)
         c += T.c
         return c
     end
@@ -331,7 +331,7 @@ function _variance_functional(μ, G)
             for i in 1:numChildren
                 v += _variance(T.children[i], T.ω)
             end
-            v *= T.μ / μ(T.z...)
+            v *= T.μ / μ(T.θ, T.z...)
             for i in 1:numChildren
                 Ω_i = _evaluate(T.children[i])
                 for j in (i+1):numChildren
@@ -347,8 +347,8 @@ function _variance_functional(μ, G)
     function _variance(S::MultifidelitySample)
         Gbar = weighted_mean(G, S)
         Δ²(θ) = abs2(G(θ) - Gbar)
-        Δ²(T::MultifidelityPathTree{0}) = Δ²(get_θ(T))
-        Δ²V(T) = Δ²(T)*_variance(T, 0.0)
+        Δ²(T::MultifidelityPathTree{0}) = Δ²(T.θ)
+        Δ²V(T) = Δ²(T) * _variance(T, 0.0)
         return mean(Δ²V, S)
     end
     return _variance
@@ -363,9 +363,7 @@ end
 
 Returns the function `J(S::MultifidelitySample)::Float64` which is used as a Monte Carlo estimate of the product of
 - the mean simulation time per iteration
-- the mean squared error proxy.
-
-Given `G` and `S`, we aim to use `Flux.jl` to optimise the function `μ`, with `J(S)` as the cost function that evolves with `mu`.
+- the mean squared error proxy
 """
 function cost_functional(μ, G)
     _burden = _burden_functional(μ)
