@@ -113,7 +113,7 @@ struct PlaceholderLikelihood <: AbstractTractableLikelihood
     ω::Float64
 end
 function _evaluate(L::PlaceholderLikelihood, θ::Vector{<:Real})
-    sleep(0.0001 * θ[1])
+    sleep(0.01 * θ[1])
     L.ω
 end
 
