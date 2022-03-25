@@ -112,8 +112,8 @@ The parameter space is the Real line.
 struct PlaceholderLikelihood <: AbstractTractableLikelihood
     ω::Float64
 end
-function _evaluate(L::PlaceholderLikelihood, θ::Real)
-    sleep(0.0001 * θ)
+function _evaluate(L::PlaceholderLikelihood, θ::Vector{<:Real})
+    sleep(0.0001 * θ[1])
     L.ω
 end
 
